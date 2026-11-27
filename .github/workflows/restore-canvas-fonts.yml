@@ -1,0 +1,23 @@
+name: Restore canvas fonts
+on:
+  push:
+    paths:
+      - '.github/workflows/restore-canvas-fonts.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore and verify upstream fonts
+        run: python3 skills/canvas-design/restore_fonts.py
+      - name: Commit font dependencies
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add skills/canvas-design/canvas-fonts/*.ttf
+          git diff --cached --quiet && exit 0
+          git commit -m "Add verified canvas design font dependencies"
+          git push
